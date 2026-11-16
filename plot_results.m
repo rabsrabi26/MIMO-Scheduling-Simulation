@@ -1,58 +1,21 @@
-function plot_results(avg_await, ci_await, avg_att, ci_att, avg_jfi, ci_jfi, avg_util, ci_util, algorithm_names)
-    % PLOT_RESULTS Create visualization of simulation results
-    
-    % Create figure
-    figure('Position', [100, 100, 1200, 800]);
-    
-    % Plot Average Waiting Time
-    subplot(2, 2, 1);
-    bar(avg_await);
-    hold on;
-    errorbar(1:length(avg_await), avg_await, ci_await, 'k.', 'LineWidth', 1.5);
-    title('Average Waiting Time');
-    ylabel('Time (ms)');
-    set(gca, 'XTickLabel', algorithm_names);
-    xtickangle(45);
-    grid on;
-    
-    % Plot Average Turnaround Time
-    subplot(2, 2, 2);
-    bar(avg_att);
-    hold on;
-    errorbar(1:length(avg_att), avg_att, ci_att, 'k.', 'LineWidth', 1.5);
-    title('Average Turnaround Time');
-    ylabel('Time (ms)');
-    set(gca, 'XTickLabel', algorithm_names);
-    xtickangle(45);
-    grid on;
-    
-    % Plot Jain's Fairness Index
-    subplot(2, 2, 3);
-    bar(avg_jfi);
-    hold on;
-    errorbar(1:length(avg_jfi), avg_jfi, ci_jfi, 'k.', 'LineWidth', 1.5);
-    title('Jain''s Fairness Index');
-    ylabel('Index');
-    ylim([0, 1]);
-    set(gca, 'XTickLabel', algorithm_names);
-    xtickangle(45);
-    grid on;
-    
-    % Plot Resource Utilization
-    subplot(2, 2, 4);
-    bar(avg_util);
-    hold on;
-    errorbar(1:length(avg_util), avg_util, ci_util, 'k.', 'LineWidth', 1.5);
-    title('Resource Utilization');
-    ylabel('Utilization');
-    ylim([0, 1]);
-    set(gca, 'XTickLabel', algorithm_names);
-    xtickangle(45);
-    grid on;
-    
-    % Add overall title
-    sgtitle('Performance Comparison of Scheduling Algorithms', 'FontSize', 16, 'FontWeight', 'bold');
-    
-    % Save figure
-    saveas(gcf, 'scheduling_results.png');
+function plot_results(results,cfg,filename)
+%PLOT_RESULTS Plot means with 95% normal-approximation confidence intervals.
+A=cellstr(results.algorithms);
+figure("Color","w","Position",[100 100 1200 800]);
+names={"waiting","turnaround","fairness","utilization"};
+titles={"Mean waiting time","Mean turnaround time","Jain fairness","Resource utilization"};
+ylabs={"ms","ms","Index","Fraction"};
+for k=1:4
+    subplot(2,2,k);
+    m=results.summary.(names{k}).mean;
+    ci=results.summary.(names{k}).ci95;
+    bar(m); hold on;
+    errorbar(1:numel(m),m,ci,"k.","LineWidth",1.2);
+    set(gca,"XTick",1:numel(m),"XTickLabel",A);
+    xtickangle(25); title(titles{k}); ylabel(ylabs{k}); grid on;
+    if k>=3, ylim([0 1]); end
+end
+sgtitle(sprintf("Scheduling comparison: K=%d, M=%d, runs=%d", ...
+    cfg.numUsers,cfg.numAntennas,cfg.numRuns));
+exportgraphics(gcf,filename,"Resolution",180);
 end
