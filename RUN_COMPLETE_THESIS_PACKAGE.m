@@ -24,7 +24,16 @@ fprintf('====================================================\n');
 
 fprintf('\nProject folder: %s\n', projectDir);
 
+
 %% STEP 2: CHECK REQUIRED INPUT FILES
+
+% Archived package locations
+archivedPackageDir = fullfile(projectDir, ...
+    'Final_Thesis_Package', ...
+    'Complete_Thesis_Package_20261116_231600');
+
+archivedStatsDir = fullfile(archivedPackageDir, ...
+    'Statistical_Results');
 
 requiredFiles = {
     'plot_final_thesis_figures.m'
@@ -35,8 +44,22 @@ requiredFiles = {
 
 for k = 1:numel(requiredFiles)
 
-    if ~isfile(fullfile(projectDir, requiredFiles{k}))
-        error('Required file not found: %s', requiredFiles{k});
+    fileName = requiredFiles{k};
+    rootFile = fullfile(projectDir, fileName);
+    archivedFile = fullfile(archivedStatsDir, fileName);
+
+    % Restore a missing root-level input from the archived package
+    if ~isfile(rootFile) && isfile(archivedFile)
+
+        copyfile(archivedFile, rootFile);
+
+        fprintf('Restored from archive: %s\n', fileName);
+
+    end
+
+    if ~isfile(rootFile)
+        error('Required file not found in project or archive: %s', ...
+            fileName);
     end
 
 end
@@ -123,6 +146,7 @@ else
     warning('Table folder not found.');
 end
 
+
 %% STEP 8: COPY STATISTICAL RESULTS
 
 fprintf('\n====================================================\n');
@@ -139,11 +163,17 @@ statisticalFiles = {
 
 for k = 1:numel(statisticalFiles)
 
-    sourceFile = fullfile(projectDir, statisticalFiles{k});
+    fileName = statisticalFiles{k};
+
+    sourceFile = fullfile(projectDir, fileName);
+
+    if ~isfile(sourceFile)
+        sourceFile = fullfile(archivedStatsDir, fileName);
+    end
 
     if isfile(sourceFile)
         copyfile(sourceFile, statisticsDir);
-        fprintf('Copied: %s\n', statisticalFiles{k});
+        fprintf('Copied: %s\n', fileName);
     end
 
 end
@@ -163,11 +193,20 @@ dataFiles = {
 
 for k = 1:numel(dataFiles)
 
-    sourceFile = fullfile(projectDir, dataFiles{k});
+    fileName = dataFiles{k};
+
+    sourceFile = fullfile(projectDir, fileName);
+
+    if ~isfile(sourceFile)
+        sourceFile = fullfile(archivedStatsDir, fileName);
+    end
 
     if isfile(sourceFile)
         copyfile(sourceFile, statisticsDir);
-        fprintf('Copied: %s\n', dataFiles{k});
+        fprintf('Copied: %s\n', fileName);
+    else
+        warning('Data file not found in project or archive: %s', ...
+            fileName);
     end
 
 end
@@ -188,11 +227,15 @@ else
     fprintf('No sensitivity_results folder found.\n');
 end
 
+
 %% STEP 11: COPY SOURCE CODE
 
 fprintf('\n====================================================\n');
 fprintf('STEP 8: COPYING SOURCE CODE\n');
 fprintf('====================================================\n');
+
+archivedSourceDir = fullfile(archivedPackageDir, ...
+    'Source_Files');
 
 sourceFiles = {
     'main.m'
@@ -214,14 +257,23 @@ sourceFiles = {
 
 for k = 1:numel(sourceFiles)
 
-    sourceFile = fullfile(projectDir, sourceFiles{k});
+    fileName = sourceFiles{k};
+
+    sourceFile = fullfile(projectDir, fileName);
+
+    if ~isfile(sourceFile)
+        sourceFile = fullfile(archivedSourceDir, fileName);
+    end
 
     if isfile(sourceFile)
         copyfile(sourceFile, sourceDir);
-        fprintf('Copied: %s\n', sourceFiles{k});
+        fprintf('Copied: %s\n', fileName);
+    else
+        warning('Source file not found: %s', fileName);
     end
 
 end
+
 
 %% STEP 12: CREATE SUMMARY REPORT
 
