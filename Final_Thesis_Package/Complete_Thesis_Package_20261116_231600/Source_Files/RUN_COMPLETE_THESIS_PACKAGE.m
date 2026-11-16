@@ -155,6 +155,8 @@ fprintf('STEP 6: COPYING EXPERIMENT DATA\n');
 fprintf('====================================================\n');
 
 dataFiles = {
+    'final_thesis_results.mat'
+    'independent_seed_results.mat'
     'combined_200run_results.mat'
     'combined_200run_summary.csv'
 };
