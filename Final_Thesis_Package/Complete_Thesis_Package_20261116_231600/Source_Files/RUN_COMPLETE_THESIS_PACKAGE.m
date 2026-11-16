@@ -201,6 +201,7 @@ sourceFiles = {
     'calculate_channel.m'
     'test_scheduler.m'
     'run_final_experiments.m'
+    'run_independent_seed_validation.m'
     'validate_final_thesis_results.m'
     'compare_final_priority_vs_mlq.m'
     'combine_and_validate_200_runs.m'
