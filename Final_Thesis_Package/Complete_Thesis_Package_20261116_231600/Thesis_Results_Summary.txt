@@ -1,0 +1,47 @@
+COMPLETE THESIS RESULTS PACKAGE
+============================================
+
+Generated: 16-Nov-2026 23:16:16
+
+EXPERIMENT CONFIGURATION
+--------------------------------------------
+Combined Monte Carlo runs per scenario: 200
+User scenarios: 20, 40 and 60
+Antennas: 16
+Priority alpha: 0.5
+Priority beta: 0.5
+
+SCHEDULING ALGORITHMS
+--------------------------------------------
+Priority (proposed)
+Multilevel Queue (proposed)
+Round Robin
+Proportional Fair
+Max C/I
+
+OUTPUTS
+--------------------------------------------
+Six performance figures.
+Descriptive statistical tables.
+Pairwise comparisons.
+Paired t-tests.
+Wilcoxon signed-rank tests.
+Holm-adjusted p-values.
+Confidence intervals and effect sizes.
+Sensitivity-analysis files, if available.
+
+INTERPRETATION NOTES
+--------------------------------------------
+Waiting time and turnaround time are closely related outcomes.
+
+Completion fairness is Jain fairness over per-user effective completion rates, not conventional throughput fairness.
+
+Service-efficiency fairness measures fairness over normalized service-efficiency fractions.
+
+Resource utilization is an abstract workload and makespan-based resource-packing measure, not physical-layer RF efficiency.
+
+The simulation is an abstract multi-server wireless scheduling model, not a complete Massive MIMO physical-layer simulation.
+
+Statistical significance should be considered alongside effect sizes and practical importance.
+
+END OF REPORT

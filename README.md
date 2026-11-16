@@ -1,79 +1,76 @@
-# MIMO Scheduling Simulation — reviewed implementation
+# MIMO Scheduling Simulation — Final Thesis Version
 
-This is a corrected, reproducible MATLAB scheduling simulator based on the
-original repository's five-policy comparison:
+This repository contains the reviewed MATLAB implementation and the final thesis analysis package for a five-policy wireless scheduling comparison.
 
-1. Priority (distance + service class)
-2. Multilevel Queue (distance bands, strict queue priority)
-3. Round Robin (preemptive time quantum)
-4. Proportional Fair (instantaneous channel rate / moving-average rate)
-5. Max C/I (best channel among currently eligible users)
+## Scheduling policies
 
-## Important modelling scope
+1. Priority (proposed)
+2. Multilevel Queue (proposed)
+3. Round Robin
+4. Proportional Fair
+5. Max C/I
 
-The original project uses the number of base-station antennas as the number
-of independent servers. This package preserves that abstraction so the
-scheduling policies can be compared consistently. It is **not a complete
-physical-layer Massive MIMO simulator**: it does not implement channel
-vectors, spatial multiplexing, precoding/combining, antenna correlation,
-multiuser interference, or SINR after precoding. The channel model here is
-large-scale log-distance path loss plus log-normal shadowing, converted to a
-rate factor using Shannon spectral efficiency.
+The final Priority configuration uses \`alpha = 0.5\` and \`beta = 0.5\`.
 
-The generated `work_ms` is a workload at the normalized reference rate.
-Actual service duration is workload divided by the user's channel rate factor.
-Every user is reserved on at most one server at a time. RR can be preempted
-after its configured quantum; other policies are non-preemptive.
+## Experiment configuration
 
-## Requirements
+- 16 abstract service resources (one per configured antenna).
+- User-load scenarios: 20, 40, and 60 users.
+- Final combined dataset: 200 paired Monte Carlo runs per scenario.
+- The combined runs are formed from two independent 100-run experiment batches.
+- The same generated user/channel scenario is used across all algorithms within a run to support paired comparisons.
 
-- MATLAB R2021a or newer recommended.
-- Base MATLAB only; no Communications Toolbox functions such as `randsrc`
-  are required.
+## Modelling scope and limitations
 
-## Run
+This is an **abstract event-driven multi-server wireless scheduling simulation**, not a complete physical-layer Massive MIMO simulator. Each antenna is represented as an independent service resource. The model does not implement per-antenna channel vectors, spatial multiplexing, precoding/combining, antenna correlation, multi-user interference, or post-precoding SINR.
 
-```matlab
-main
-```
+The channel model uses large-scale log-distance path loss and log-normal shadowing to derive a normalized channel-rate factor. The configured bandwidth is not used to calculate a physical-layer system throughput.
 
-For the parameter grid:
+## Reported metrics
 
-```matlab
-run_sensitivity
-```
+- **Waiting time:** turnaround time minus actual service time.
+- **Turnaround time:** completion time minus arrival time.
+- **Completion-rate fairness:** Jain's index over per-user effective completion rates (delivered workload divided by turnaround time); this is not conventional throughput fairness.
+- **Service-efficiency fairness:** Jain's index over normalized per-user service-efficiency fractions.
+- **Mean service efficiency:** mean of the normalized per-user service-efficiency fractions.
+- **Resource utilization:** total service workload divided by the number of resources times the measured makespan. This is an abstract workload/makespan packing measure, not physical RF or antenna utilization.
 
-Run basic invariant checks:
+Waiting time and turnaround time are closely related because turnaround time includes waiting plus service time. Interpret statistical significance alongside confidence intervals and effect sizes; do not claim that either proposed policy universally outperforms every benchmark.
 
-```matlab
-validate_results
-```
+## MATLAB requirements
 
-Outputs are saved under `results/`.
+MATLAB R2021a or newer is recommended. The project uses base MATLAB functionality and Statistics and Machine Learning Toolbox functions for statistical tests and Student-t confidence intervals.
 
-## Metrics
+## Reproducing the thesis package
 
-- Waiting time = completion time − arrival time − actual service time.
-- Turnaround time = completion time − arrival time.
-- Jain fairness = Jain index of per-user delivered workload divided by
-  turnaround time.
-- Resource utilization = total occupied server-time / (M × measured makespan).
+The final combined result files are:
 
-Confidence intervals are 95% normal-approximation intervals over independent
-Monte Carlo runs. For publication-grade inference, increase the number of
-runs and consider Student-t intervals or bootstrap intervals.
+- \`combined_200run_results.mat\`
+- \`combined_200run_summary.csv\`
+- \`combined_200run_statistical_validation.mat\`
+- \`combined_200run_statistical_validation.csv\`
 
-## Reproducibility
+With these files present in the project directory, run:
 
-`cfg.seed` controls the experiment seed. The same generated user/channel
-scenario is used for all algorithms within a run (paired comparison), reducing
-variance in policy comparisons.
+\`\`\`matlab
+RUN_COMPLETE_THESIS_PACKAGE
+\`\`\`
+
+This regenerates the six publication-style figures and statistical tables and assembles a timestamped \`Complete_Thesis_Package_*\` folder. It does **not** rerun the Monte Carlo simulations.
+
+To run the underlying 100-run experiment batch from scratch, use \`run_final_experiments.m\`. The independent-seed batch and combined 200-run analysis are handled by their corresponding validation/combination scripts. Only run these when intentionally reproducing the experiments; they are not required to regenerate the final report from the saved combined results.
+
+## Final deliverables
+
+The thesis package contains:
+- Six figures (PNG at 300 DPI and editable MATLAB FIG files).
+- Descriptive and pairwise statistical tables.
+- Paired t-test and Wilcoxon signed-rank results with Holm-adjusted p-values.
+- Effect-size information.
+- Combined experiment data and sensitivity-analysis outputs.
+- The source files used to generate the package.
+- A results summary with modelling and interpretation notes.
 
 ## Research caution
 
-The scheduler definitions and system abstraction must match the thesis
-methodology and cited literature. In particular, strict-priority distance
-queues, service-class priority weights, and the choice of channel-aware
-service model are modelling decisions, not universal definitions. Validate
-these assumptions with your supervisor and thesis equations before using
-the numerical results as final research claims.
+The scheduler definitions, service-class weights, queue boundaries, and channel-rate abstraction are modelling choices. Ensure they are consistent with the thesis methodology and cited literature, and describe the abstraction and metric definitions explicitly when reporting results.
